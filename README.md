@@ -1,7 +1,7 @@
 #Installation instructions for MetaPhlAn2 in a Galaxy environment.
 These instructions require the Mercurial versioning system, galaxy, and an internet connection.
 
-#For general information about GraphLan pease refer to:
+#For general information about MetaPhlAn2 please refer to:
 ```
 https://bitbucket.org/biobakery/metaphlan2
 ```
