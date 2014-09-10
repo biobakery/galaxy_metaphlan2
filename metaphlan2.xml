@@ -1,0 +1,205 @@
+<tool id="metaphlan2" name="MetaPhlAn2" version="2.0.0">
+	<description>metagenomic profiler V2</description>
+	<command interpreter="python">metaphlan2.py $input 
+		--mpa_pkl /usr/local/galaxy-dist/tools/metaphlan2/db_v20/mpa_v20_m200.pkl    
+		--bowtie2db /usr/local/galaxy-dist/tools/metaphlan2/db_v20/mpa_v20_m200 
+		--input_type  fastq
+		--no_map 
+		--bt2_ps $PresetsForBowtie2  
+		#if $str($gchoice_post_mapping.global_choice_post_mapping)  == "1":
+			--tax_lev $gchoice_post_mapping.Taxonomic_Level
+			--min_cu_len $gchoice_post_mapping.min_cu_len
+
+			#if $str($gchoice_post_mapping.Ignore_Viruses)  == "1":
+				--ignore_viruses
+			#end if		
+			#if $str($gchoice_post_mapping.Ignore_Eukaryotes)  == "1":
+				--ignore_eukaryotes   
+			#end if	
+			#if $str($gchoice_post_mapping.Ignore_Bacteria)  == "1":
+				--ignore_bacteria
+			#end if	
+			#if $str($gchoice_post_mapping.Ignore_Archaea)  == "1":
+				--ignore_archaea
+			#end if	
+
+			--stat_q $gchoice_post_mapping.stat_q
+		#end if
+ 
+		#if $str($gchoice_additional_analysis_types.global_additional_analysis_types)  == "1":
+ 			-t $gchoice_additional_analysis_types.Analysis_Type 
+			#if  int($gchoice_additional_analysis_types.nreads) > 0:
+				--nreads $gchoice_additional_analysis_types.nreads
+			#end if	
+			
+			#if  int($gchoice_additional_analysis_types.pres_th) > 0:
+				--pres_th  $gchoice_additional_analysis_types.pres_th
+			#end if	
+			
+			#if $str($gchoice_additional_analysis_types.clade)  != " ":
+				--clade $gchoice_additional_analysis_types.clade 
+				#if  int($gchoice_additional_analysis_types.min_ab) > 0:
+						 --min_ab  $gchoice_additional_analysis_types.min_ab             
+				#end if				
+			#end if				
+			
+		#end if
+ 		-o $output 
+		
+			
+		#if $str($gchoice_biom.global_biom)  == "1":
+			--biom $biom_output
+			--mdelim $gchoice_biom.MetadataDelimiterChar
+		#end if	
+	</command>
+	<inputs>
+		<param format="fastq" name="input" type="data" label="Input metagenome (fastq of metagenomic reads, loaded with the Get Data module )"></param>
+
+		<param name="PresetsForBowtie2" type="select" format="text" >
+			<label>Sensitivity options for read-marker similarity (as described by BowTie2)</label>
+				<option value="very-sensitive">Very Sensitive</option>
+				<option value="sensitive">Sensitive</option>
+				<option value="very-sensitive-local">Very Sensitive  Local</option>
+				<option value="sensitive-local">Sensitive  Local</option>
+
+		</param>	
+		
+		
+		
+	<conditional name="gchoice_post_mapping">
+        	<param name="global_choice_post_mapping" type="select" label="Display Post Mapping Advanced Parameters"  multiple="False" help="Select Post Mapping advanced choices ">
+        		<option value="0" selected='True'>No</option>
+				<option value="1">Yes</option>
+        	</param>
+           	<when value="0">
+ 				<param name="min_cu_len" type="hidden"  value=""  />
+			</when>
+
+        	<when value="1">
+				<param name="Taxonomic_Level" type="select" value="a" format="text" >
+					<label>Taxonomic Level</label>
+						<option value="a">All taxonomic levels</option>
+						<option value="k">Kingdoms (Bacteria and Archaea) only</option>
+						<option value="p">Phyla only</option>
+						<option value="o">Orders only</option>
+						<option value="f">Families only</option>
+						<option value="g">Genera only</option>
+						<option value="s">Species only</option>
+				</param>
+				<param name="min_cu_len" type="integer" size="4"   value="2000" label="Minimum total nucleotide length for the markers in a clade "/>
+
+				<param name="Ignore_Viruses" type="select" label="Profile viral organisms" value="0" >
+						<option value="0">Yes</option>
+						<option value="1">No</option>
+				</param>
+				
+				<param name="Ignore_Eukaryotes" type="select" label="Profile eukaryotic organisms" value="0" >
+						<option value="0">Yes</option>
+						<option value="1">No</option>
+				</param>		
+				
+				<param name="Ignore_Bacteria" type="select" label="Profile bacterial organisms" value="0" >
+						<option value="0">Yes</option>
+						<option value="1">No</option>
+				</param>
+
+				<param name="Ignore_Archaea" type="select" label="Profile archeal organisms" value="0" >
+						<option value="0">Yes</option>
+						<option value="1">No</option>
+				</param>	
+
+				<param name="stat_q" type="float"     value="0.1"  min="0" max="1.0" label=" Quantile value for the robust average "/>
+				
+			</when>
+        </conditional>
+		
+	<conditional name="gchoice_additional_analysis_types">
+        	<param name="global_additional_analysis_types" type="select" label="Display additional analysis types and arguments advanced parameters"  multiple="False" help="Select additional analysis types and argument advanced choices ">
+        		<option value="0" selected='True'>No</option>
+				<option value="1">Yes</option>
+        	</param>
+           	<when value="0">
+ 				<param name="Analysis_Type" type="hidden"  value=""  />
+			</when>
+
+        	<when value="1">
+				<param name="Analysis_Type" type="select" value="rel_ab" format="text" >
+					<label>Analysis Type: Type of Analysis to perform</label>
+						<option value="rel_ab">Profiling a metagenomes in terms of relative abundances</option>
+						<option value="reads_map">Mapping from reads to clades (only reads hitting a marker)</option>
+						<option value="clade_profiles">Normalized marker counts for clades with at least a non-null marker</option>
+						<option value="marker_ab_table">normalized marker counts (only when > 0.0 and normalized by metagenome size if --nreads is specified)</option>
+						<option value="marker_pres_table">list of markers present in the sample (threshold at 1.0 if not differently specified with --pres_th</option>
+				</param>
+				
+				<param name="nreads" type="integer" size="4"   value="0" label="The total number of reads in the original metagenome "/>
+				<param name="pres_th" type="integer" size="4"  value="0"   label="Threshold for calling a marker present"/>
+				<param name="clade" label="The clade for clade specific strain tracker analysis"  value=" " type="text" format="text"/>
+				<param name="min_ab" type="integer" size="4"  value="0" min="0" max="100"  label="The minimum percentage abundance for the clade in the clade specific strain tracker analysis"/>	
+	
+			</when>
+        </conditional>
+		
+		
+		
+		
+		<conditional name="gchoice_biom">
+        	<param name="global_biom" type="select" label="Display additional biom advanced parameters"  help="Select additional biom  choices ">
+        		<option value="0" selected='True'>No</option>
+				<option value="1">Yes</option>
+        	</param>
+           	<when value="0">
+			</when>
+
+        	<when value="1">
+				<param name="MetadataDelimiterChar" label="Delimiter for bug metadata if biom file requested - defaults to pipe. e.g. the pipe in k__Bacteria|p__Proteobacteria"  value="|" type="text" format="text"/>
+			</when>
+        </conditional>
+ 
+
+	</inputs>
+	<outputs>
+		<data name="output" format="tabular" />
+        <data name="biom_output"  format="text">
+            <filter>gchoice_biom["global_biom"] == "1"</filter>
+        </data>
+	 
+
+	</outputs>
+      
+  <help>
+**MetaPhlAn**  is a computational tool for profiling the composition of microbial communities *(Bacteria, Archaea, Eukaryotes and Viruses)* from metagenomic shotgun sequencing data with species level resolution. 
+
+From version 2.0 MetaPhlAn is also able to identify specific strains (in the not-so-frequent cases in which the sample contains a previously sequenced strains) and to track strains across samples for all species.
+
+MetaPhlAn 2.0 relies on ~1M unique clade-specific marker genes identified from ~17,000 reference genomes (~13,500 bacterial and archaeal, ~3,500 viral, and ~110 eukaryotic), allowing:
+
+* Unambiguous taxonomic assignments 
+
+* Accurate estimation of organismal relative abundance 
+
+* Species-level resolution for bacteria, archaea, eukaryotes and viruses 
+
+* Strain identification and tracking
+
+* Orders of magnitude speedups compared to existing methods.
+
+EXAMPLE
+-------
+
+Here is an infographic of the application of the Human Microbiome Project results obtained applying MetaPhlAn on the 690 shotgun sequencing samples.  The image has been produced with GraPhlAn.
+
+
+.. image::    https://bytebucket.org/nsegata/metaphlan/wiki/hmptree13_nl_bb.png
+    :height: 500
+    :width: 600
+
+
+
+If you use this software, please cite :
+=======================================
+
+**Metagenomic microbial community profiling using unique clade-specific marker genes.** Nicola Segata, Levi Waldron, Annalisa Ballarini, Vagheesh Narasimhan, Olivier Jousson, Curtis Huttenhower. Nature Methods, 8, 811–814, 2012
+
+  </help>
+</tool>
