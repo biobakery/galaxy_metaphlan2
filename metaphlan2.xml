@@ -159,7 +159,7 @@
 
 	</inputs>
 	<outputs>
-		<data name="output" format="tabular" />
+		<data name="output" format="metaphlan" />
         <data name="biom_output"  format="text">
             <filter>gchoice_biom["global_biom"] == "1"</filter>
         </data>
@@ -183,6 +183,38 @@ MetaPhlAn 2.0 relies on ~1M unique clade-specific marker genes identified from ~
 * Strain identification and tracking
 
 * Orders of magnitude speedups compared to existing methods.
+   
+    
+---------  
+    
+.. class:: infomark
+
+**Input example:** You can try out MetaPhlAn using the synthetic dataset available at: https://bitbucket.org/biobakery/galaxy_metaphlan2/wiki/metaphlan2_synth_sample.fastq  
+
+There is no need to download the file, you can just copy-and-paste the dataset address in the "Upload File" module inside the "Load Data" link here in the left panel.
+
+  
+
+---------
+
+**Inputs**
+
+The input file must be a multi-fasta file containing metagenomic reads loaded with the "Get Data" module in the left panel. Reads can be as short as ~40 nt although lengths higher than 70 nt are recommended.
+
+A synthetic metagenome you can use as sample input is available at https://bitbucket.org/biobakery/galaxy_metaphlan2/wiki/metaphlan2_synth_sample.fastq 
+
+**Outputs**
+
+The output is a two column tab-separated plain file reporting the predicted microbial clades present in the metagenomic samples and the corresponding relative abundances.
+
+There is the option to request the output in BIOM format.
+
+All taxonomic levels from domain to species will be reported and higher taxonomic levelis contain the sum of the abundances of its taxonomic leaf nodes (usually species) and, possibly, some lower level "unclassified" clades.
+
+
+---------
+
+
 
 EXAMPLE
 -------
