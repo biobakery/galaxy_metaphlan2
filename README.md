@@ -1,16 +1,16 @@
-#Installation instructions for MetaPhlAn2 in a Galaxy environment.
+# Installation instructions for MetaPhlAn2 in a Galaxy environment.
 These instructions require the Mercurial versioning system, galaxy, and an internet connection.
 
-#For general information about MetaPhlAn2 please refer to:
+# For general information about MetaPhlAn2 please refer to:
 ```
-https://bitbucket.org/biobakery/metaphlan2
+https://github.com/biobakery/metaphlan
 ```
-#Installation procedure: MetaPhlAn2  under Galaxy
+# Installation procedure: MetaPhlAn2  under Galaxy
 
 Go to the ```//usr/local/galaxy-dist/tools```  directory
 Clone metaphlan2 by entering the following command    
 
-```hg clone https://george_weingart@bitbucket.org/biobakery/metaphlan2```
+```git clone https://github.com/biobakery/MetaPhlAn.git```
  
 Clone this repository somewhere: It will create a directory named "galaxy_metaphlan2"
 
@@ -29,5 +29,5 @@ Update member tool_conf.xml  in the galaxy directory adding the following:
  
 Recycle galaxy
 
-#Note:
+# Note:
 Once the repository will e upladed to the tool shed, the instructions will be updated accordingly
